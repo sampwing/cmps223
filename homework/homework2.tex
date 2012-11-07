@@ -1,0 +1,43 @@
+\documentclass[11pt]{amsart}
+\usepackage{geometry}                % See geometry.pdf to learn the layout options. There are lots.
+\geometry{letterpaper}                   % ... or a4paper or a5paper or ... 
+%\geometry{landscape}                % Activate for for rotated page geometry
+%\usepackage[parfill]{parskip}    % Activate to begin paragraphs with an empty line rather than an indent
+\usepackage{graphicx}
+\usepackage{amssymb}
+\usepackage{epstopdf}
+\DeclareGraphicsRule{.tif}{png}{.png}{`convert #1 `dirname #1`/`basename #1 .tif`.png}
+
+\title{CMPS223: Homework \#2}
+\author{Sam Wing}
+%\date{}                                           % Activate to display a given date or no date
+
+\begin{document}
+\maketitle
+\section{Access Control Matrix}
+
+I designed the Access Control Matrix as seen in the table below.  The subjects are users (U) 1 through m, and the objects are also users (U) 1 through m.  The operations are as follows: a - play, b - reset account, c - view balance. 
+
+\begin{table}[h]
+\centering
+\begin{tabular}{| l | c | c | c | c | c |}
+\hline
+properties \ objects  & $U_1$ & $U_2$ & $U_3$ & ...  & $U_m$ \\ \hline
+$U_1$ & abc & bc & bc & bc  & bc \\ \hline
+$U_2$ &  & ac &  &   &  \\ \hline
+$U_3$ &  &  & ac &   &  \\ \hline
+... &  &  &  &  ac &  \\ \hline
+$U_m$ &  &  &  &   &  ac \\ \hline
+\end{tabular}
+\caption{Problem \#1 Access Control Matrix}
+\label{acl}
+\end{table}
+
+\section{Principle of Saltzer and Schroeder}
+Upon reading through the principles put fourth by Saltzer and Schroeder, one stood out in stark contrast to another idea I have heard over and over.  They propose for \emph{open design}, which essentially states that the implementation should be open and that security should not depend on ignorance of attackers.  The idea that I found this conflicted with the most is \emph{security by obscurity}, which is designing software whose implementation is put into place such that it is difficult to navigate and understand.  This principle is followed particularly in the realm of Cryptography Software, where the assumption is that the enemy has the system- can view all of the code, but the true security lies in pass codes or keys.  According to $http://en.wikipedia.org/wiki/Security_through_obscurity$, "The United States National Institute of Standards and Technology (NIST) specifically recommends against security through obscurity in more than one document"  which would indicate that this principle is still followed today.
+
+\section{Lampson's "Protection" vs the Web}
+The protection domains of Lampson's paper talks proposes a \emph{messaging system}.  This system consists of processes who pass messages between each other which have secure identification codes.  It later goes on to describe how these processes can be though of as separate machines, how fitting for comparing this system to the web.  We can use this definition and modify it to represent the web, by saying that the system is in fact the internet and each process is a machine connected to the internet.  These messages that are getting passed are analogous to internet packets.  The main differences between Lampson's system and the internet, is that he states that the identification tag in messages is secure and cannot be forged - however, on the internet this identification code, or for this example internet address, can be forged via spoofing.  The other difference is that messages allow an arbitrary amount of data to be sent within each message, packets have specifications to limit them to a certain number so whereas you might be able to send a single message on the message system, you may be required to send multiple packets over the internet to accommodate the standard.
+
+
+\end{document}  
