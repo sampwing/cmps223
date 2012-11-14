@@ -1,0 +1,71 @@
+\documentclass[11pt]{amsart}
+\usepackage{geometry}                % See geometry.pdf to learn the layout options. There are lots.
+\geometry{letterpaper}                   % ... or a4paper or a5paper or ... 
+%\geometry{landscape}                % Activate for for rotated page geometry
+%\usepackage[parfill]{parskip}    % Activate to begin paragraphs with an empty line rather than an indent
+\usepackage{graphicx}
+\usepackage{amssymb}
+\usepackage{epstopdf}
+\usepackage{enumerate}
+\DeclareGraphicsRule{.tif}{png}{.png}{`convert #1 `dirname #1`/`basename #1 .tif`.png}
+
+\title{CMPS223: Homework \#3}
+\author{Sam Wing}
+%\date{}                                           % Activate to display a given date or no date
+
+\begin{document}
+\maketitle
+\section{Access Control Matrix}
+
+Consider a system with three users A, B, and C, two objects O and P,and one operation on the objects.Consider the following policy (written in Binder notation):
+\begin{itemize}	\item trusted(A).	\item A says trusted(B).	\item A says may-access(C,O).	\item may-access(x,O) :- trusted(y), y says may-access(x,O).	\item may-access(x,P) :- trusted(x).	\item trusted(x) :- trusted(y), y says trusted(x).
+\end{itemize}
+
+We can reduce this as follows:
+\begin{itemize}
+	\item trusted(A) by trusted(A)
+	\item trusted(B) by trusted(B) :- trusted(A), y says trusted(B)
+	\item may-access(A,P) by may-access(A,P) :- trusted(A)
+	\item may-access(B,P) by may-access(B,P) :- trusted(B)
+	\item may-access(C,O) by may-access(C,O) :- trusted(A), A says may-access(C,O).
+\end{itemize}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{| l | c | c | }
+\hline
+properties $\diagdown$ objects  & $O$ & $P$  \\ \hline
+$A$ &  & r\\ \hline
+$B$ &  & r \\ \hline
+$C$ & r &  \\ \hline
+\end{tabular}
+\caption{Problem \#1 Access Control Matrix, r indicates that the property may-access the object}
+\label{acl}
+\end{table}
+
+\section{Security and Relational Semantics}
+The following questions are about the definition of security by Joshi and Leino. If in doubt, you may use the relational version of the definition. For (a)–(g), simply answer “yes”, “no”, or “it depends”.
+
+\begin{enumerate}[a]
+	\item Yes
+	\item Yes
+	\item No
+	\item No
+	\item Yes
+	\item No
+	\item It Depends
+	\item We know that the program S is deterministic due to its ending condition being h,k = 0.  So we can use lemma 27 from the paper to prove that it is secure. \\ S is secure $\equiv$ ($\forall M$ :: wlp.S.(k $\neq$ M) $\epsilon$ Cyl)
+	\item So (f) is not secure because either S or T are revealed depending on the polarity of k.  (g) can possibly be insecure because the composition can possibly reveal information about the secure variables, say S is an adds some value to 0, then S ; T will yield T.  But there are cases when the composition of S ; T will not reveal any information about (g).
+\end{enumerate}
+
+
+\section{HiStar}
+Given that there exists a thread T and a segment S, and suppose that T can start another thread T' that can read S. Discuss whether it follows that T can also read S.  This implies $L_S \sqsubseteq_{O_{T'}} L_{T'}$.
+
+\begin{enumerate}[a]
+	\item No, $L_T$ does not necessarily equal $L_{T'}$, in the paper it is not specified whether new threads are granted the labels of their parent threads. So I assumed the threads had no privileges until they were otherwise granted.
+	\item The paper states "Threads ... can be created with an ownership set O as long as $O \subseteq O_T$."  While it doesn't specify the default behavior of thread creation, we know that if $L_S \sqsubseteq_{O_{T'}} L_{T'}$ and that  $O_{T'} \subseteq O_T$, that $O_T$ contains \emph{at least} all the ownership properties of $O_{T'}$.  So making $O_T = O_T'$ doesn't change the result.
+	\item Yes, in this case we already know that $O_T$ is a superset of $O_{T'}$, and now given that $L_T = L_{T'}$ is is true that  $L_S \sqsubseteq_{O_{T}} L_{T}$.
+\end{enumerate}
+
+\end{document}  
