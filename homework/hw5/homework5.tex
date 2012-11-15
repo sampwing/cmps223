@@ -1,0 +1,47 @@
+\documentclass[11pt]{amsart}
+\usepackage{geometry}                % See geometry.pdf to learn the layout options. There are lots.
+\geometry{letterpaper}                   % ... or a4paper or a5paper or ... 
+%\geometry{landscape}                % Activate for for rotated page geometry
+%\usepackage[parfill]{parskip}    % Activate to begin paragraphs with an empty line rather than an indent
+\usepackage{graphicx}
+\usepackage{amssymb}
+\usepackage{epstopdf}
+\usepackage{enumerate}
+\DeclareGraphicsRule{.tif}{png}{.png}{`convert #1 `dirname #1`/`basename #1 .tif`.png}
+
+\title{CMPS223: Homework \#5}
+\author{Sam Wing}
+%\date{}                                           % Activate to display a given date or no date
+
+\begin{document}
+\maketitle
+\section{Factoring using Euler's Totient}
+
+Below are the steps to factor the Euler's Totient of 7031.
+
+\begin{itemize}
+	\item $\phi (7031)$ = $\phi(p)\phi(q)$
+	\item $\phi (7031)$ = $(p-1)(q-1)$
+	\item $\phi (7031)$ = $n - (p+q) + 1$
+	\item $\phi (7031)$ = $7031 - (p + q) + 1$
+	\item $6864$ = $7032 - (p + q) $
+	\item $168$ = $(p + q)$
+	\item $168 - q$ = $p$
+	\item $6864$ = $(p - 1)(q - 1) $
+	\item $6864$ = $(168 - q - 1)(q - 1) $
+	\item $6864$ = $(167 - q )(q - 1) $	
+	\item $6864$ = $167q - 167 - q^2 + q$
+	\item $6864$ = $168q - 167 - q^2$
+	\item $q^2 - 168q + 7031$
+	\item Solving for the roots we get 79 and 89.  So these are the factors of $\phi(7031)$.  
+\end{itemize}
+
+
+\section{Fully Homomorphic Ciphertext Attack}
+
+
+Let us say that we are given a ciphertext C, any we can obtain the decryptions of any other ciphertexts $C_1$ ... $C_n$.  Say that k = length of C, and that m is the number of characters in our alphabet that can occur inside any ciphertext.  Since this is fully homomorphic we know that k will be the length of any of the other ciphertext since they are all compact ciphertexts.  Now let us generate all permutations of ciphertexts of length k such that we eventually have all $C_1$ ... $C_{k^m}$ ciphers.  We can use the fact that we can find the cipher in this set which matches the original cypher C and then decrypt that message.  
+
+
+
+\end{document}  
