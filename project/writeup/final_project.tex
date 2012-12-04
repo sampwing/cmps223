@@ -1,0 +1,114 @@
+
+\documentclass[12pt]{amsart}
+\usepackage{geometry} % see geometry.pdf on how to lay out the page. There's lots.
+\geometry{a4paper} % or letter or a5paper or ... etc
+% \geometry{landscape} % rotated page geometry
+
+% See the ``Article customise'' template for come common customisations
+
+\title{Improving Spam Filtering using NLP}
+\author{Sam Wing \\ sampwing@soe.ucsc.edu}
+\date{} % delete this line to display the current date
+
+%%% BEGIN DOCUMENT
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+In this paper I describe the use of Machine Learning and Natural Language Processing Algorithms for classifying spam emails. Detecting spam in emails versus say websites was chosen because I am more interested in working with the Natural Language Understanding of the content of emails. I chose to use the Ling-Spam \cite{bayesianfiltering} due to the data being preprocessed, with all of the header information removed and the content cleaned of any unicode or html, allowing me to focus on the NLP aspects of this problem. Additionally, using this dataset gives me a baseline for which to evaluate my results. After performing some feature extraction on the Ling-Spam corpus, I ran some experiments to determine which model would work best for classifying spam.  I then used this model to implement a spam filter than can be hooked up to an email box via the IMAP protocol for classifying spam online.
+\end{abstract}
+
+
+\section{Introduction}
+
+Introduce prevalence of spam.  Hisotry of Spam Filtering.  Originally relied on lists of keywords. Identifying the senders ip in Black lists vs White lists, and grey lists.  Onto Automatic Machine learning techniques employed today.
+
+Spam messages which contain phishing attacks are a valid security threat (/cite spamimages) Define Philtering
+
+Spam messages are big business. While there are many different forms of spam that we run across on the internet, such as website, advertisement, and email. I chose to focus on email spam do to their being a smaller number of influencing and measur- able factors. There may be many spam messages that are not dangerous, however there are some mes- sages which contain phishing scams. ÓPhishing is the act of attempting to acquire information such as usernames, passwords, and credit card details ... by masquerading as a trustworthy entity ...Ó CITE WIKIPEDIA OR SOME OTHER SITE THAT DEFINES PHISHING 
+There are several different methods currently used for identifying spam, which are often used in conjunction with one another to increate the performance of the spam filter. Many of the features that I am interested involve fea- ture extraction for use in machine learning classifi- cation problems. These include feature extraction on the content of an email, trying to process or structure the natural language. Another approach is to per- form feature extraction on the header of the email, this can allow you to filter by user names, domain names, or even specific IP addresses. Another ap- proach which has been talked about lately is feature extraction and classification of images embedded in emails. Extracting text from images is a very in- volved task and beyond the scope of this project. 
+Modern spam filters have a very high > 90% ac- curacy in identifying spam messages.CITE A PA- PER SAYING AS MUCH Many of these filters employ a specific set of features, namely the Bag- Of-Words CITE Bo OPINION MINING PAPER model, to differentiate spam from ham (legitimate messages.) My question is whether or not we can employ more linguistically informed features to gain additional improvements on accuracy. 
+
+\section{Previous Work}
+
+	One of the first papers on automatically identifying spam was the work done by Androutsopoulos et al. \cite{bayesianfiltering}.  Their work is inspired by the work of McCallum et. al.\cite{naivebayes}, who had used Naive Bayes for text classification.  I used the Ling-Spam dataset which was used in this paper because it is fairly naive in it's assumption that Bag of Words model is the best feature to use for purely content based feature extraction, while disregarding non-textual information.  There have been some improvements in computational linguistics in the last decade and I hope to try to improve on the performance of automatic classification found in this paper.
+	
+	I also looked at the work done by Fette et al \cite{phishing}, for automatically filtering phishing attempts out from email.  Their approach assumed that the problem of identifying spam was solved, they had a boolean feature used in training their model which specific whether a particular email was spam or ham before deriving additional features..  They did however utilize a few features based on the content, which consisted of essentially counting the number of links within emails, and further analyzing each of those links by the number of subdomains contained within each link.  This paper used SVMs, I chose to follow suite and add SVMs as an additional classifier to identify spam messages in my project.
+
+\section{Feature Extraction}
+
+	There were a number of ideas from the papers I read for this project in addition to my own work in NLP that lead me to a variety of feature extraction on the content of the emails found in the Ling-Spam corpus.  The first of which was to create a Bag of Words model, specifying each token as a boolean whether it had occurred or not\cite{pang}, which was described in a number of papers \cite{bayesianfiltering} \cite{phishing} I used as a baseline to compare against a number of classifiers with a combination of additional features.  The Bag of Words model had some additional preproccessing which included passing it through a Snowball Stemmer \cite{snowball}.  Stemmers are used to reduce the dimensionality of text processing problems, and by collapsing several correlated words into a single group can improve performance of the classifier.
+	
+	Another group of features which were extracted were the LIWC features.  The LIWC is a dictionary of mappings from words to up to seventy different categories. Current the LIWC maps 2320 word stems to up to seventy different categories.  These categories include groups such as pronouns, affect, cognitive mechanisms, social words, amongst a number of other useful distinct groupings. My hope is that these categories and the words that map into them, will have a different distribution between spam and ham which may enable the classifier to improve its performance. 
+	
+	WordNet Domains is another tool which was used to extract an additional set of categories not covered by the LIWC. WordNet Domains consists of 164, hierarchically organized,\cite{wordnet} domain labels.  Containing such groups such as Sports, Buildings, etc.  This tools allows us to further reduce the dimensionality of the documents and examine the similarities between the documents that we would have not been able to without this semantic information.
+	
+	The last feature set that was derived using MSOL \cite{msol}.  This is a tool which maps verbs and nouns into either a positive or negative polarity domains.  It has been researched heavily that content polarity can be useful in a variety of text classification problems \cite{sentiment}, so I figured I would attempt to use it in spam identification.
+
+\section{Experiment}
+
+	The dataset which was used for the training and testing the spam filter that I created was the Ling-Spam dataset.  The Ling-Spam dataset consists of 2412 ham messages, and 481 spam messages.   Spam is 16.6\% of the corpus.  I chose to use three different classifiers, Naive Bayes, SVM with a linear kernel, and Logistic Regression.  I didn't come across papers which used Logistic Regression for Spam Filtering, but I have personally found Logistic Regression to handle text classification tasks fairly well.  	Each test was performed with three fold cross validation, this number was chosen do to the sparsity of the spam messages when compared to ham which was a one to six ratio.  I wanted the classifier to have enough spam messages to train on to get accurate scores. In addition to using cross validation, I employed the use of $\chi^2$ feature selector to reduce the dimensionality of the vector space even more.  This greatly improves the performance of classifiers like SVM, which tries to find a soft linear separation between all data points, and reducing the dimensionality greatly speeds up this process.
+
+
+\section{Results}
+
+\begin{table}
+\centering
+\begin{tabular}{| l | l | r | r | r |}
+	\hline
+	Classifier & Features & Precision & Recall & Accuracy \\
+	\hline
+	 Logistic & baseline &99.14\% & 96.67\% & 99.41\% \\
+	 & bow-desc &{\bf 99.35\%} & 96.67\% & 99.44\% \\
+	 & bow-desc-liwc &97.44\% & 94.59\% & 98.92\% \\
+	 & bow-desc-polarity &99.14\% & 96.88\% & 99.44\% \\
+	 & bow-desc-wn &{\bf 99.35\%} & 96.67\% & 99.44\% \\
+	 & bow-desc-wn-polarity &99.14\% & 96.88\% & {\bf 99.48\%} \\
+	 \hline
+	 Naive Bayes & baseline &98.13\% & {\bf 98.54\%} & 99.37\% \\
+	 & bow-desc &97.73\% & {\bf 98.54\%} & 99.27\% \\
+	 & bow-desc-liwc &98.54\% & 98.33\% & 99.2\% \\
+	 & bow-desc-polarity &98.13\% & {\bf 98.54\%} & 99.3\% \\
+	 & bow-desc-wn &97.93\% & {\bf 98.54\%} & 99.27\% \\
+	 & bow-desc-wn-polarity &98.33\% & {\bf 98.54\%} & 99.34\% \\
+	 \hline
+	 SVM Linear& baseline &98.72\% & 95.84\% & 98.99\% \\
+	 & bow-desc &98.92\% & 95.63\% & 98.99\% \\
+	 & bow-desc-liwc &96.79\% & 93.97\% & 98.75\% \\
+	 & bow-desc-polarity &99.13\% & 95.63\% & 99.03\% \\
+	 & bow-desc-wn &98.92\% & 95.84\% & 98.99\% \\
+	 & bow-desc-wn-polarity &99.13\% & 95.63\% & 99.03\% \\
+	\hline
+\end{tabular}
+\caption{Experiment results using a variety of classifiers and features}
+\label{tab:results}
+\end{table}
+
+\begin{table}
+\centering
+\begin{tabular}{| l | r | r | r |}
+	\hline
+	& Prec & Recall & Accuracy \\
+	\hline
+	Performance & 100\% & 63.67\% & 99.993\% \\
+	\hline
+\end{tabular}
+\caption{Results of Androutsopoulos et. al. on the Ling-Spam dataset, stemming a bag of words model}
+\label{tab:lingspam}
+\end{table}
+
+\section{Implementation of Spam Filter}
+
+	After running the experiments I chose to use the Bag of Words model that didn't discriminate between subject and body. to create the spam classifier to be used in my spam filter.  The machine learning algorithms were from a python package called Sci-Kit-Learn\cite{sklearn}.  I chose to use the IMAP protocol for connecting to the email server, since both my school and personal email addresses are through GMAIL which supports the IMAP protocol.  Additionally, I used the python library email for parsing the RFC822 specification to retrieve the content information, consisting of the subject and body of the email.  Although I was able to grab the header information if I wanted, I chose to use the same textual content information that was available in the Ling-Spam dataset, so that I wouldn't have to tweak the classifier.
+	
+	When running my program, it is assumed that you have a gmail account.  You will be prompted for your user name and password before your mailbox begins to download and run through the spam filter.  Messages classified as spam will be placed into the spam filter, and ham messages placed into the ham folder.  I have found that running this on my own email I get poor results.  This is likely due to the training data being over a decade old.  I had wanted to retrain the classifier using the spam collected  for my emails by google, but apparently these emails are deleted after thirty days, so there was not enough spam to retrain.
+
+\section{Future Work}
+	The work I focused on was the purely textual information given in the body of an email.  However there is other work being done on extracting further textual information from the images which can be embedded in emails, which allows the attacker to circumvent any purely textual analysis of spam messages.  Fumera et al. \cite{spamimages} describe a process similar to how I wished to approach the problem of spam filtering.  However instead of looking at the text found within the body of the emails to analyze, instead they focus on using OCR software to extract textual information from images embedded within emails.  Working with image data would entail more of an understanding of computer vision than I currently have, as well as finding an annotated corpus to use in identifying the text found in such images.
+
+
+\bibliographystyle{plain}
+\bibliography{biblio}
+
+\end{document}
