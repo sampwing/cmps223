@@ -16,19 +16,17 @@
 \maketitle
 
 \begin{abstract}
-In this paper I describe the use of Machine Learning and Natural Language Processing Algorithms for classifying spam emails. Detecting spam in emails versus say websites was chosen because I am more interested in working with the Natural Language Understanding of the content of emails. I chose to use the Ling-Spam \cite{bayesianfiltering} due to the data being preprocessed, with all of the header information removed and the content cleaned of any unicode or html, allowing me to focus on the NLP aspects of this problem. Additionally, using this dataset gives me a baseline for which to evaluate my results. After performing some feature extraction on the Ling-Spam corpus, I ran some experiments to determine which model would work best for classifying spam.  I then used this model to implement a spam filter than can be hooked up to an email box via the IMAP protocol for classifying spam online.
+In this paper I describe the use of Machine Learning and Natural Language Processing Algorithms for classifying spam emails. Detecting spam in emails versus say websites was chosen because I am more interested in working with the Natural Language Understanding of the content of emails. I chose to use the Ling-Spam \cite{bayesianfiltering} due to the data being preprocessed, with all of the header information removed and the content cleaned of any unicode or html, allowing me to focus on the NLP aspects of this problem. Additionally, using this dataset gives me a baseline for which to evaluate my results. After performing some feature extraction on the Ling-Spam corpus, I ran some experiments to determine which model would work best for classifying spam.  I then used this model to implement a spam filter than can be hooked up to an email box via the IMAP protocol for classifying spam online. Project can be found at: \\https://github.com/sampwing/cmps223/tree/master/project/spam\_filter.py
 \end{abstract}
 
-
 \section{Introduction}
+Spam filtering is an important topic in computer security, but not because all spam is malicious.  There does however exist a subset of these messages which are actually phishing attacks.  A phishing attack\cite{wikiphishing} is when an attacker poses as a reliable source or company, and attempts to gain personal information about a victim such as user names, passwords, credit card information, or any other number of otherwise hidden attributes.  Attackers can sometimes create lists of these user name / password combinations to be used for attacking vulnerable websites.  While not a phishing attack we have seen this time and time again, such as the leak of information from Sony, or the more recent leak of these credentials from LinkedIn.  Apparently, often times some users will use the same credentials for multiple sites -which is how this information can be used for cross site attacks.
 
-Introduce prevalence of spam.  Hisotry of Spam Filtering.  Originally relied on lists of keywords. Identifying the senders ip in Black lists vs White lists, and grey lists.  Onto Automatic Machine learning techniques employed today.
+In this paper I will refer to legitimate emails, which the user most likely wants to receive as ham, all other messages will be referred to as spam.  In spam filtering it is important to correctly identify ham messages as such so that they are not filtered, it is more important that a user receives all of their ham messages and letting a few spam messages pass through than having 100\% recall on spam items but filtering some of the legitimate ham messages.
 
-Spam messages which contain phishing attacks are a valid security threat (/cite spamimages) Define Philtering
+There are a number of ways modern spam filters attempt to distinguish between spam and ham, they are often used in conjunction with one another to achieve high levels of performance.  One of the most elegant ways is through means of OCR, when text is extracted from images embedded in these emails and is then passed off to some other classifier to determine if the text contained within the images is ham or spam.  Another method is by looking at the header of an email.  The header contains a variety of information but one of the more useful fields found in the header is the originating source of the email.  There exist white and black lists which contain known ham and spam web addresses appropriately.  Spam filters are able to use this originating source information to determine if it belongs to either of these two lists to help in classifying a message as spam.  The method I am focusing on is the plain text which is sent in the body, that most people are likely familiar with when talking about email.
 
-Spam messages are big business. While there are many different forms of spam that we run across on the internet, such as website, advertisement, and email. I chose to focus on email spam do to their being a smaller number of influencing and measur- able factors. There may be many spam messages that are not dangerous, however there are some mes- sages which contain phishing scams. ÓPhishing is the act of attempting to acquire information such as usernames, passwords, and credit card details ... by masquerading as a trustworthy entity ...Ó CITE WIKIPEDIA OR SOME OTHER SITE THAT DEFINES PHISHING 
-There are several different methods currently used for identifying spam, which are often used in conjunction with one another to increate the performance of the spam filter. Many of the features that I am interested involve fea- ture extraction for use in machine learning classifi- cation problems. These include feature extraction on the content of an email, trying to process or structure the natural language. Another approach is to per- form feature extraction on the header of the email, this can allow you to filter by user names, domain names, or even specific IP addresses. Another ap- proach which has been talked about lately is feature extraction and classification of images embedded in emails. Extracting text from images is a very in- volved task and beyond the scope of this project. 
-Modern spam filters have a very high > 90% ac- curacy in identifying spam messages.CITE A PA- PER SAYING AS MUCH Many of these filters employ a specific set of features, namely the Bag- Of-Words CITE Bo OPINION MINING PAPER model, to differentiate spam from ham (legitimate messages.) My question is whether or not we can employ more linguistically informed features to gain additional improvements on accuracy. 
+I present a number of features which have been successfully used in Natural Language Processing for text classification tasks which I hope to use in my experiments to gain a better performance over some existing techniques that deal with processing this plain text found in the body of emails.  I will use these features and a number of classifiers to determine what the best model is given my data and feature set, and use this model in my own implementation of a spam filter which will work on filtering emails it reads through the IMAP protocol.
 
 \section{Previous Work}
 
@@ -53,7 +51,9 @@ Modern spam filters have a very high > 90% ac- curacy in identifying spam messag
 
 \section{Results}
 
-\begin{table}
+After performing the experiments I generated a table of my results in Table \ref{tab:results}.  The features I chose to show were the better performing features, bow-desc is the bag of word model that discriminates between subject and body.  Polarity is any data gathered from running MSOL over the data. WN is running WordNet Domains over the textual content.  The first thing I found strange was the different between Table \ref{tab:results} and Table \ref{tab:lingspam}, I was curious why they were able to get better Precision and Accuracy scores than me.  After thinking about it however, I believe it is because they used a different stemmer than I did.  I used the Snowball stemmer trained on the english language, whereas they used the GATE Naive Bayes and Stemmer, which is trained on British English.  The Snowball implementation I used did not support British English.
+
+\begin{table}[h]
 \centering
 \begin{tabular}{| l | l | r | r | r |}
 	\hline
@@ -85,7 +85,10 @@ Modern spam filters have a very high > 90% ac- curacy in identifying spam messag
 \label{tab:results}
 \end{table}
 
-\begin{table}
+
+However just looking at the differences in my results in Table /ref{tab:results}.  It is apparent that using these features, SVM with a linear kernel is pretty much useless, well not useless but not as performant as the other classifiers with this feature set and corpus.  I am able to get the best spam recall with Naive Bayes at 98.5\%, which means that we correctly classified that amount of our actual spam messages.  Several of the other feature sets perform as well recall-wise, but this is simply due to the $\chi^2$ feature selection choosing the bag of words model on each iteration through the experiment.  The Logisitc Regression classifier get the best Accuracy when I threw all of the features at it, however it is not statistically significantly better than the baseline model for Logistic Regression.  The same could be said about its Precision scores.  For this reason, I chose to use the Naive Bayes Bag of Words model for implementing my Spam Filter.
+
+\begin{table}[h]
 \centering
 \begin{tabular}{| l | r | r | r |}
 	\hline
@@ -98,12 +101,16 @@ Modern spam filters have a very high > 90% ac- curacy in identifying spam messag
 \label{tab:lingspam}
 \end{table}
 
+\section{Conclusion}
+While unfortunate that my original intuition remains unfounded that I could increase the performance of spam filters working on a content based level, it is worth mentioning that when accuracy is as high as it is 99.4\% it is extremely difficult to get any statistically significant gains.  I believe this is why current work in this field is focusing on other methods of identifying spam, such as looking at the information in the headers to identify domains from the blacklists, and the other hot topic of using OCR to extract additional content from the embedded images of emails.
+
 \section{Implementation of Spam Filter}
 
 	After running the experiments I chose to use the Bag of Words model that didn't discriminate between subject and body. to create the spam classifier to be used in my spam filter.  The machine learning algorithms were from a python package called Sci-Kit-Learn\cite{sklearn}.  I chose to use the IMAP protocol for connecting to the email server, since both my school and personal email addresses are through GMAIL which supports the IMAP protocol.  Additionally, I used the python library email for parsing the RFC822 specification to retrieve the content information, consisting of the subject and body of the email.  Although I was able to grab the header information if I wanted, I chose to use the same textual content information that was available in the Ling-Spam dataset, so that I wouldn't have to tweak the classifier.
 	
 	When running my program, it is assumed that you have a gmail account.  You will be prompted for your user name and password before your mailbox begins to download and run through the spam filter.  Messages classified as spam will be placed into the spam filter, and ham messages placed into the ham folder.  I have found that running this on my own email I get poor results.  This is likely due to the training data being over a decade old.  I had wanted to retrain the classifier using the spam collected  for my emails by google, but apparently these emails are deleted after thirty days, so there was not enough spam to retrain.
 
+	My final project can be found at: \\ https://github.com/sampwing/cmps223/tree/master/project/spam\_filter.py
 \section{Future Work}
 	The work I focused on was the purely textual information given in the body of an email.  However there is other work being done on extracting further textual information from the images which can be embedded in emails, which allows the attacker to circumvent any purely textual analysis of spam messages.  Fumera et al. \cite{spamimages} describe a process similar to how I wished to approach the problem of spam filtering.  However instead of looking at the text found within the body of the emails to analyze, instead they focus on using OCR software to extract textual information from images embedded within emails.  Working with image data would entail more of an understanding of computer vision than I currently have, as well as finding an annotated corpus to use in identifying the text found in such images.
 
